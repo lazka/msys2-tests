@@ -50,8 +50,6 @@ libtool:
 gettext:
 	(cd gettext && ./test.sh)
 
-keyring:
-	(cd keyring && ./test.sh)
 
 clean:
 	$(MAKE) -C autotools clean
