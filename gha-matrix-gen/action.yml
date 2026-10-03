@@ -24,6 +24,8 @@ runs:
           { 'msystem': 'MSYS', 'cc': 'gcc', 'cxx': 'g++', 'fc': 'gfortran' },
           { 'msystem': 'MSYS', 'cc': 'gcc', 'cxx': 'g++', 'fc': 'gfortran' },
           { 'msystem': 'MSYS', 'cc': 'gcc', 'cxx': 'g++', 'fc': 'gfortran' },
+          { 'msystem': 'MSYS', 'cc': 'gcc', 'cxx': 'g++', 'fc': 'gfortran' },
+          { 'msystem': 'MSYS', 'cc': 'gcc', 'cxx': 'g++', 'fc': 'gfortran' },
         ]
         for entry in matrix:
           entry['runner'] = 'windows-2025' if entry['msystem'] != 'CLANGARM64' else 'windows-11-arm'
