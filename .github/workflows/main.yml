@@ -36,18 +36,8 @@ jobs:
       - uses: msys2/setup-msys2@v2
         with:
           msystem: ${{ matrix.msystem }}
-          update: true
+          update: false
           install: ${{ matrix.packages }}
-
-      - name: Add staging repo
-        shell: msys2 {0}
-        run: |
-          sed -i '1s|^|[staging]\nServer = https://repo.msys2.org/staging/\nSigLevel = Never\n|' /etc/pacman.conf
-
-      - name: Update using staging
-        run: |
-          msys2 -c 'pacman --noconfirm -Suuy'
-          msys2 -c 'pacman --noconfirm -Suu'
 
       - name: Run tests
         uses: ./
