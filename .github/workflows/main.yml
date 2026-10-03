@@ -39,10 +39,5 @@ jobs:
           update: false
           install: ${{ matrix.packages }}
 
-      - name: Update using staging
-        run: |
-          msys2 -c 'pacman -U --noconfirm "https://mirror.msys2.org/msys/x86_64/msys2-runtime-3.6.10-6-x86_64.pkg.tar.zst" "https://mirror.msys2.org/msys/x86_64/msys2-runtime-devel-3.6.10-6-x86_64.pkg.tar.zst"'
-          
-
       - name: Run tests
         uses: ./
