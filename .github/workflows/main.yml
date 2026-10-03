@@ -36,7 +36,7 @@ jobs:
       - uses: msys2/setup-msys2@v2
         with:
           msystem: ${{ matrix.msystem }}
-          update: false
+          update: true
           install: ${{ matrix.packages }}
 
       - name: Update using staging
