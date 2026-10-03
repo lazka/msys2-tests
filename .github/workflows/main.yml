@@ -36,15 +36,18 @@ jobs:
       - uses: msys2/setup-msys2@v2
         with:
           msystem: ${{ matrix.msystem }}
-          update: false
+          update: true
           install: ${{ matrix.packages }}
+
+      - name: Add staging repo
+        shell: msys2 {0}
+        run: |
+          sed -i '1s|^|[staging]\nServer = https://repo.msys2.org/staging/\nSigLevel = Never\n|' /etc/pacman.conf
 
       - name: Update using staging
         run: |
-          msys2 -c 'pacman -U --noconfirm "https://mirror.msys2.org/msys/x86_64/msys2-runtime-3.6.10-6-x86_64.pkg.tar.zst" "https://mirror.msys2.org/msys/x86_64/msys2-runtime-devel-3.6.10-6-x86_64.pkg.tar.zst"'
-          msys2 -c 'pacman -U --noconfirm "https://mirror.msys2.org/msys/x86_64/libpcre2_8-10.49-1-x86_64.pkg.tar.zst"'
-          msys2 -c 'pacman -U --noconfirm "https://mirror.msys2.org/msys/x86_64/libopenssl-3.6.5-1-x86_64.pkg.tar.zst" "https://mirror.msys2.org/msys/x86_64/openssl-3.6.5-1-x86_64.pkg.tar.zst"'
-          msys2 -c 'pacman -U --noconfirm "https://mirror.msys2.org/msys/x86_64/openssh-10.5p1-3-x86_64.pkg.tar.zst"'
+          msys2 -c 'pacman --noconfirm -Suuy'
+          msys2 -c 'pacman --noconfirm -Suu'
 
       - name: Run tests
         uses: ./
