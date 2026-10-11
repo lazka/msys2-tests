@@ -24,32 +24,58 @@ jobs:
       fail-fast: false
       matrix: 
         include: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
-
-    name: ${{ matrix.msystem }}-${{ matrix.cc }}
+    name: ${{ matrix.msystem }}-${{ matrix.cc }}${{ matrix.type == 'docker' && '-docker' || '' }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 30
     env:
       CC: ${{ matrix.cc }}
       CXX: ${{ matrix.cxx }}
       FC: ${{ matrix.fc }}
+      MSYS2_TEST_CONTAINER: msys2-tests
     steps:
       - uses: actions/checkout@v6
 
       - uses: msys2/setup-msys2@v2
+        if: matrix.type == 'host'
         with:
           msystem: ${{ matrix.msystem }}
           update: true
           install: ${{ matrix.packages }}
 
       - name: Add staging repo
+        if: matrix.type == 'host'
         shell: msys2 {0}
         run: |
           sed -i '1s|^|[staging]\nServer = https://repo.msys2.org/staging/\nSigLevel = Never\n|' /etc/pacman.conf
 
       - name: Update using staging
+        if: matrix.type == 'host'
         run: |
           msys2 -c 'pacman --noconfirm -Suuy'
           msys2 -c 'pacman --noconfirm -Suu'
 
       - name: Run tests
+        if: matrix.type == 'host'
         uses: ./
+
+      # https://github.com/actions/runner-images/issues/13729
+      - name: Start Docker
+        if: matrix.type == 'docker'
+        shell: pwsh
+        run: |
+          if ((Get-Service docker).Status -ne 'Running') {
+            Start-Service docker
+          }
+
+      - name: Set up MSYS2 container
+        if: matrix.type == 'docker'
+        shell: pwsh
+        env:
+          MSYS2_TEST_PACKAGES: ${{ matrix.packages }}
+        run: ./.ci/setup-docker.ps1
+
+      - name: Run tests in Docker
+        if: matrix.type == 'docker'
+        shell: pwsh
+        run: |
+          docker exec $env:MSYS2_TEST_CONTAINER C:\msys64\usr\bin\bash.exe -lc 'bash /c/msys2-tests/run-tests.sh'
